@@ -1,5 +1,6 @@
 class ProspectsController < ApplicationController
   before_action :set_prospect, only: [:show, :edit, :update, :destroy]
+  before_action :set_dropdowns, only: [:new, :edit]
 
   # GET /prospects
   # GET /prospects.json
@@ -29,10 +30,8 @@ class ProspectsController < ApplicationController
     respond_to do |format|
       if @prospect.save
         format.html { redirect_to @prospect, notice: 'Prospect was successfully created.' }
-        format.json { render :show, status: :created, location: @prospect }
       else
         format.html { render :new }
-        format.json { render json: @prospect.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -43,10 +42,8 @@ class ProspectsController < ApplicationController
     respond_to do |format|
       if @prospect.update(prospect_params)
         format.html { redirect_to @prospect, notice: 'Prospect was successfully updated.' }
-        format.json { render :show, status: :ok, location: @prospect }
       else
         format.html { render :edit }
-        format.json { render json: @prospect.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -57,7 +54,6 @@ class ProspectsController < ApplicationController
     @prospect.destroy
     respond_to do |format|
       format.html { redirect_to prospects_url, notice: 'Prospect was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 
@@ -65,6 +61,10 @@ class ProspectsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_prospect
       @prospect = Prospect.find(params[:id])
+    end
+
+    def set_dropdowns
+      @credit = ['COD', 'CC', 'CREDIT TERMS']
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

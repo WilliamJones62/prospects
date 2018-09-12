@@ -38,7 +38,7 @@
 
   <div class="field">
     <%= form.label :credit_terms %>
-    <%= form.text_field :credit_terms, id: :prospect_credit_terms %>
+    <%= form.select :credit_terms, @credit, {}, {:value => params[:credit_terms], id: :prospect_credit_terms} %>
   </div>
 
   <div class="actions">
