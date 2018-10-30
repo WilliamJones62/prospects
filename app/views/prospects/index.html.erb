@@ -1,16 +1,20 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Prospects</h1>
-
 <table id="normal_dt"  class="stripe" class="mytable" class="display" cellspacing="0" >
   <thead>
     <tr>
+      <% if current_user.email == "admin" %>
+        <th>Rep</th>
+      <% end %>
       <th>Customer</th>
       <th>Name</th>
       <th>Calls</th>
       <th>First call</th>
       <th>Last call</th>
       <th>Credit terms</th>
+      <th>1st order</th>
+      <th>2nd order</th>
+      <th>3rd order</th>
       <th>Show</th>
       <th>Edit</th>
       <th>Delete</th>
@@ -20,15 +24,47 @@
   <tbody>
     <% @prospects.each do |prospect| %>
       <tr>
+        <% if current_user.email == "admin" %>
+          <td><%= prospect.rep %></td>
+        <% end %>
         <td><%= prospect.customer_id %></td>
         <td><%= prospect.name %></td>
-        <td><%= prospect.calls %></td>
-        <td><%= prospect.first_call %></td>
-        <td><%= prospect.last_call %></td>
+        <td><%= prospect.prospect_calls.count %></td>
+        <% if prospect.prospect_calls.present? %>
+          <% if prospect.prospect_calls.first.call_date %>
+            <td><%= display_date(prospect.prospect_calls.first.call_date) %></td>
+          <% else %>
+            <td></td>
+          <% end %>
+          <% if prospect.prospect_calls.last.call_date %>
+            <td><%= display_date(prospect.prospect_calls.last.call_date) %></td>
+          <% else %>
+            <td></td>
+          <% end %>
+        <% else %>
+          <td></td>
+          <td></td>
+        <% end %>
         <td><%= prospect.credit_terms %></td>
+        <% if @orders[@i] && @orders[@i] != '' %>
+          <td><%= display_date(@orders[@i]) %></td>
+        <% else %>
+          <td></td>
+        <% end %>
+        <% if @orders[@i+1] && @orders[@i+1] != '' %>
+          <td><%= display_date(@orders[@i+1]) %></td>
+        <% else %>
+          <td></td>
+        <% end %>
+        <% if @orders[@i+2] && @orders[@i+2] != '' %>
+          <td><%= display_date(@orders[@i+2]) %></td>
+        <% else %>
+          <td></td>
+        <% end %>
+        <% @i += 3 %>
         <td><%= link_to 'Show', prospect %></td>
         <td><%= link_to 'Edit', edit_prospect_path(prospect) %></td>
-        <td><%= link_to 'Destroy', prospect, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Delete', prospect, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

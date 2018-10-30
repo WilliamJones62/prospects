@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  prospect_id: 1
+  who: MyString
+  outcome: MyString
+  call_date: 2018-10-04
+
+two:
+  prospect_id: 1
+  who: MyString
+  outcome: MyString
+  call_date: 2018-10-04

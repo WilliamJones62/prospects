@@ -1,0 +1,21 @@
+<%= form_for (@prospect, @prospect_call) do |f| %>
+  <table>
+    <thead>
+      <tr>
+        <th> <%= f.label :who, 'Contact' %> </th>
+        <th> <%= f.label :outcome %> </th>
+        <th> <%= f.label :call_date %> </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td> <%= f.text_field :who %> </td>
+        <td> <%= f.text_field :outcome %> </td>
+        <td> <%= f.date_field :call_date %> </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

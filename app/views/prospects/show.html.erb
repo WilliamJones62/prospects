@@ -1,34 +1,61 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Customer:</strong>
-  <%= @prospect.customer_id %>
-</p>
+<h3>Showing Prospect</h3>
 
-<p>
-  <strong>Name:</strong>
-  <%= @prospect.name %>
-</p>
+<table>
+  <thead>
+    <tr>
+      <th> Rep </th>
+      <th> Business name </th>
+      <th> Calls </th>
+      <th> First call </th>
+      <th> Last call </th>
+      <th> Credit terms </th>
+      <th> Customer </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td> <%= @prospect.rep %> </td>
+      <td> <%= @prospect.name %> </td>
+      <td> <%= @prospect.prospect_calls.count %> </td>
+      <% if @first == ' ' %>
+        <td></td>
+        <td></td>
+      <% else %>
+        <td> <%= display_date(@first) %> </td>
+        <% if @last == ' ' %>
+          <td></td>
+        <% else %>
+          <td> <%= display_date(@last) %> </td>
+        <% end %>
+      <% end %>
+      <td> <%= @prospect.credit_terms %> </td>
+      <td> <%= @prospect.customer_id %> </td>
+    </tr>
+  </tbody>
+</table>
 
-<p>
-  <strong>Calls:</strong>
-  <%= @prospect.calls %>
-</p>
-
-<p>
-  <strong>First call:</strong>
-  <%= @prospect.first_call %>
-</p>
-
-<p>
-  <strong>Last call:</strong>
-  <%= @prospect.last_call %>
-</p>
-
-<p>
-  <strong>Credit terms:</strong>
-  <%= @prospect.credit_terms %>
-</p>
+<table id="normal_dt"  class="stripe" class="mytable" class="display" cellspacing="0" >
+  <thead>
+    <tr>
+      <th> Contact </th>
+      <th> Outcome </th>
+      <th> Call date </th>
+      <th> Delete </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @prospect.prospect_calls.each do |c| %>
+    <tr>
+      <td> <%= c.who %> </td>
+      <td> <%= c.outcome %> </td>
+      <td> <%= display_date(c.call_date) %> </td>
+      <td><%= link_to 'Delete', prospect_prospect_call_path(@prospect.id, c.id), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
 
 <%= link_to 'Edit', edit_prospect_path(@prospect) %>
 <%= link_to 'List', prospects_path %>

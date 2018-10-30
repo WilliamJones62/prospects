@@ -11,36 +11,59 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :customer_id %>
-    <%= form.text_field :customer_id, id: :prospect_customer_id %>
-  </div>
+  <table>
+    <thead>
+      <tr>
+        <th> <%= form.label :rep %> </th>
+        <th> <%= form.label :name, "Business name" %> </th>
+        <th> <%= form.label :calls %> </th>
+        <th> <%= form.label :first_call %> </th>
+        <th> <%= form.label :last_call %> </th>
+        <th> <%= form.label :credit_terms %> </th>
+        <th> <%= form.label :customer_id, "Customer code" %> </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td> <%= form.text_field :rep, :value => @user, id: :prospect_rep %> </td>
+        <td> <%= form.text_field :name, id: :prospect_name %> </td>
+        <td> <%= @prospect.prospect_calls.count %> </td>
+        <% if @first == ' ' %>
+          <td></td>
+          <td></td>
+        <% else %>
+          <td> <%= display_date(@first) %> </td>
+          <% if @last == ' ' %>
+            <td></td>
+          <% else %>
+            <td> <%= display_date(@last) %> </td>
+          <% end %>
+        <% end %>
+        <td> <%= form.select :credit_terms, @credit, {}, {:value => params[:credit_terms], id: :prospect_credit_terms} %> </td>
+        <td> <%= form.text_field :customer_id, id: :prospect_customer_id %> </td>
+      </tr>
+    </tbody>
+  </table>
 
-  <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name, id: :prospect_name %>
-  </div>
-
-  <div class="field">
-    <%= form.label :calls %>
-    <%= form.number_field :calls, id: :prospect_calls %>
-  </div>
-
-  <div class="field">
-    <%= form.label :first_call %>
-    <%= form.date_select :first_call, id: :prospect_first_call %>
-  </div>
-
-  <div class="field">
-    <%= form.label :last_call %>
-    <%= form.date_select :last_call, id: :prospect_last_call %>
-  </div>
-
-  <div class="field">
-    <%= form.label :credit_terms %>
-    <%= form.select :credit_terms, @credit, {}, {:value => params[:credit_terms], id: :prospect_credit_terms} %>
-  </div>
-
+  <h3>Calls</h3>
+  <%= form.fields_for :prospect_calls do |p| %>
+  <table>
+    <thead>
+      <tr>
+        <td> <%= p.label :who, 'Contact' %> </td>
+        <td> <%= p.label :outcome %> </td>
+        <td> <%= p.label :call_date %> </td>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td> <%= p.text_field :who %> </td>
+          <td> <%= p.text_field :outcome %> </td>
+          <td> <%= p.date_field :call_date %> </td>
+        </tr>
+    </tbody>
+  </table>
+  <% end %>
   <div class="actions">
     <%= form.submit %>
   </div>
