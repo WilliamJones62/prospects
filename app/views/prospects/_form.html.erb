@@ -19,13 +19,25 @@
         <th> <%= form.label :calls %> </th>
         <th> <%= form.label :first_call %> </th>
         <th> <%= form.label :last_call %> </th>
-        <th> <%= form.label :credit_terms %> </th>
         <th> <%= form.label :customer_id, "Customer code" %> </th>
+        <th> <%= form.label :status, "Inactive" %> </th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td> <%= form.text_field :rep, :value => @user, id: :prospect_rep %> </td>
+        <% if @new %>
+          <% if @manager %>
+            <td> <%= form.text_field :rep, :value => @user, id: :prospect_rep %> </td>
+          <% else %>
+            <td> <%= form.text_field :rep, :value => @user, readonly: true, id: :prospect_rep %> </td>
+          <% end %>
+        <% else %>
+          <% if @manager %>
+            <td> <%= form.text_field :rep, id: :prospect_rep %> </td>
+          <% else %>
+            <td> <%= form.text_field :rep, readonly: true, id: :prospect_rep %> </td>
+          <% end %>
+        <% end %>
         <td> <%= form.text_field :name, id: :prospect_name %> </td>
         <td> <%= @prospect.prospect_calls.count %> </td>
         <% if @first == ' ' %>
@@ -39,8 +51,8 @@
             <td> <%= display_date(@last) %> </td>
           <% end %>
         <% end %>
-        <td> <%= form.select :credit_terms, @credit, {}, {:value => params[:credit_terms], id: :prospect_credit_terms} %> </td>
         <td> <%= form.text_field :customer_id, id: :prospect_customer_id %> </td>
+        <td> <%= form.check_box :status, id: :prospect_status %> </td>
       </tr>
     </tbody>
   </table>

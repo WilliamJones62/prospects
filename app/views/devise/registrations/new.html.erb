@@ -5,7 +5,12 @@
 
   <div class="field">
     <%= f.label :email, "User" %><br />
-    <%= f.text_field :email, autofocus: true, autocomplete: "email" %>
+    <%= f.text_field :email, autofocus: true %>
+  </div>
+
+  <div class="field">
+    <%= f.label :manager_id, "Manager" %><br />
+    <%= f.text_field :manager_id %>
   </div>
 
   <div class="field">

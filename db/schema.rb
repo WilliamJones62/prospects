@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181015141407) do
+ActiveRecord::Schema.define(version: 20190108181209) do
+
+  create_table "billtos", force: :cascade do |t|
+    t.string "billto_code"
+    t.string "terms_code"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "dart_sales_pricing_currents", force: :cascade do |t|
     t.integer "invoice_numb"
@@ -124,6 +131,9 @@ ActiveRecord::Schema.define(version: 20181015141407) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "rep"
+    t.string "prev_rep"
+    t.date "rep_date"
+    t.boolean "status"
   end
 
   create_table "users", force: :cascade do |t|
@@ -134,6 +144,7 @@ ActiveRecord::Schema.define(version: 20181015141407) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "manager_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

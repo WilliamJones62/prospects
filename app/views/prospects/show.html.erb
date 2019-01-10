@@ -10,8 +10,8 @@
       <th> Calls </th>
       <th> First call </th>
       <th> Last call </th>
-      <th> Credit terms </th>
       <th> Customer </th>
+      <th> Inactive </th>
     </tr>
   </thead>
   <tbody>
@@ -30,8 +30,8 @@
           <td> <%= display_date(@last) %> </td>
         <% end %>
       <% end %>
-      <td> <%= @prospect.credit_terms %> </td>
       <td> <%= @prospect.customer_id %> </td>
+      <td> <%= human_boolean(@prospect.status) %> </td>
     </tr>
   </tbody>
 </table>
