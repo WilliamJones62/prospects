@@ -2,7 +2,9 @@ Rails.application.routes.draw do
   get 'prospects/list'
   get 'prospects/selected'
   get 'prospects/custcode'
+  get 'prospects/chosen'
   get 'prospects/inactive'
+  get 'prospects/summary'
   resources :prospects do
     resources :prospect_calls, except: [:index, :show]
   end

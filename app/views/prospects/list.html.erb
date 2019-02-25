@@ -1,17 +1,18 @@
 <p id="notice"><%= notice %></p>
 
 <h2>Enter Customer Code</h2>
-
-<%= form_with url: prospects_selected_path, local: true, method: 'get' do |f| %>
-  <%= f.label:prospect_rep, 'Rep:' %>
-  <%= f.select(:prospect_rep, options_for_select(@rep, @selected_rep)) %>
-  <%= f.submit "Change" %>
+<% if @mngr == ' ' %>
+  <%= form_with url: prospects_selected_path, local: true, method: 'get' do |f| %>
+    <%= f.label:prospect_rep, 'Rep:' %>
+    <%= f.select(:prospect_rep, options_for_select(@rep, @selected_rep)) %>
+    <%= f.submit "Change" %>
+  <% end %>
 <% end %>
 
 <br>
 
 <% if !@name %>
-  <h3>No prospects for this Rep</h3>
+  <h3>No prospects</h3>
 <% else %>
   <%= form_with url: prospects_custcode_path, local: true, method: 'get' do |f| %>
     <%= f.label:prospect_name, 'Name:' %>

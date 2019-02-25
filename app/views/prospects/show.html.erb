@@ -12,6 +12,9 @@
       <th> Last call </th>
       <th> Customer </th>
       <th> Inactive </th>
+      <th> Orders </th>
+      <th> First order </th>
+      <th> Last order </th>
     </tr>
   </thead>
   <tbody>
@@ -32,6 +35,17 @@
       <% end %>
       <td> <%= @prospect.customer_id %> </td>
       <td> <%= human_boolean(@prospect.status) %> </td>
+      <td><%= @orders.count %></td>
+      <% if @orders.first && @orders.first != '' %>
+        <td><%= display_date(@orders.first) %></td>
+      <% else %>
+        <td></td>
+      <% end %>
+      <% if @orders.last && @orders.last != '' %>
+        <td><%= display_date(@orders.last) %></td>
+      <% else %>
+        <td></td>
+      <% end %>
     </tr>
   </tbody>
 </table>

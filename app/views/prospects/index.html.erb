@@ -1,77 +1,11 @@
 <p id="notice"><%= notice %></p>
 
-<table id="normal_dt"  class="stripe" class="mytable" class="display" cellspacing="0" >
-  <thead>
-    <tr>
-      <% if current_user.email == "admin" || @user == @mngr %>
-        <th>Rep</th>
-      <% end %>
-      <th>Custcode</th>
-      <th>Name</th>
-      <th>Calls</th>
-      <th>First call</th>
-      <th>Last call</th>
-      <th>1st order</th>
-      <th>2nd order</th>
-      <th>3rd order</th>
-      <% if current_user.email == "admin" %>
-        <th>Inactive</th>
-      <% end %>
-      <th>Show</th>
-      <th>Edit</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @prospects.each do |prospect| %>
-      <tr>
-        <% if current_user.email == "admin" || @user == @mngr %>
-          <td><%= prospect.rep %></td>
-        <% end %>
-        <td><%= prospect.customer_id %></td>
-        <td><%= prospect.name %></td>
-        <td><%= prospect.prospect_calls.count %></td>
-        <% if prospect.prospect_calls.present? %>
-          <% if prospect.prospect_calls.first.call_date %>
-            <td><%= display_date(prospect.prospect_calls.first.call_date) %></td>
-          <% else %>
-            <td></td>
-          <% end %>
-          <% if prospect.prospect_calls.last.call_date %>
-            <td><%= display_date(prospect.prospect_calls.last.call_date) %></td>
-          <% else %>
-            <td></td>
-          <% end %>
-        <% else %>
-          <td></td>
-          <td></td>
-        <% end %>
-        <% if @orders[@i] && @orders[@i] != '' %>
-          <td><%= display_date(@orders[@i]) %></td>
-        <% else %>
-          <td></td>
-        <% end %>
-        <% if @orders[@i+1] && @orders[@i+1] != '' %>
-          <td><%= display_date(@orders[@i+1]) %></td>
-        <% else %>
-          <td></td>
-        <% end %>
-        <% if @orders[@i+2] && @orders[@i+2] != '' %>
-          <td><%= display_date(@orders[@i+2]) %></td>
-        <% else %>
-          <td></td>
-        <% end %>
-        <% @i += 3 %>
-        <% if current_user.email == "admin" %>
-          <td> <%= human_boolean(prospect.status) %> </td>
-        <% end %>
-        <td><%= link_to 'Show', prospect %></td>
-        <td><%= link_to 'Edit', edit_prospect_path(prospect) %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New Prospect', new_prospect_path %>
+<% if !@name %>
+  <h3>No prospects</h3>
+<% else %>
+  <%= form_with url: prospects_chosen_path, local: true, method: 'get' do |f| %>
+    <%= f.label:prospect_name, 'Name:' %>
+    <%= f.select(:prospect_name, options_for_select(@name)) %>
+    <%= f.submit "Select" %>
+  <% end %>
+<% end %>

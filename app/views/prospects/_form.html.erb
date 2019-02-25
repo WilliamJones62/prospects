@@ -63,15 +63,19 @@
     <thead>
       <tr>
         <td> <%= p.label :who, 'Contact' %> </td>
-        <td> <%= p.label :outcome %> </td>
         <td> <%= p.label :call_date %> </td>
+        <td> <%= p.label :method %> </td>
+        <td> <%= p.label :subject %> </td>
+        <td> <%= p.label :outcome %> </td>
       </tr>
     </thead>
     <tbody>
         <tr>
           <td> <%= p.text_field :who %> </td>
-          <td> <%= p.text_field :outcome %> </td>
           <td> <%= p.date_field :call_date %> </td>
+          <td> <%= p.select :method, @method %> </td>
+          <td> <%= p.text_field :subject %> </td>
+          <td> <%= p.select :outcome, @outcome %> </td>
         </tr>
     </tbody>
   </table>

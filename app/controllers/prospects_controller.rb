@@ -2,15 +2,55 @@ class ProspectsController < ApplicationController
   before_action :set_prospect, only: [:show, :edit, :update, :destroy]
   before_action :set_first_and_last, only: [:show, :edit]
   before_action :set_user_and_manager, only: [:new, :edit]
-  before_action :build_rep_list, only: [:index]
+  before_action :build_rep_list, only: [:summary]
+  before_action :build_inactive_rep_list, only: [:inactive]
 
   # GET /prospects
   def index
-    @i = 0
+    @user = current_user.email.upcase
+    if @user == 'ADMIN'
+      prospects = Prospect.where(status: false).to_a
+    else
+      prospects = Prospect.where(rep: @user).where(status: false).to_a
+    end
+    @name = []
+    tempname = []
+    prospects.each do |p|
+      if !p.name.blank?
+        tempname.push(p.name)
+      end
+    end
+    @name = tempname.sort
   end
 
   # GET /prospects/1
   def show
+    # need to read last 4 orders for the customer
+    deleted_prospects = []
+    @orders = []
+    if @prospect.customer_id && @prospect.customer_id != ''
+      # there is something in the customer field so see if there are any E21 records
+      sales = DartSalesPricingCurrent.where(cust_code: @prospect.customer_id).take(4)
+      # if sales && sales.length == 4
+        # this customer is no longer a prospect so set it to inactive
+        # inactive_prospects.push(prospect)
+        # prospect.inactive = true
+        # prospect.save
+      # else
+      if sales
+        len = sales.length
+        i = 0
+        while i < len do
+          @orders[i] = sales[i].order_date
+          i += 1
+        end
+        # check the billto table to get the payment terms
+      end
+    end
+    # inactive_prospects.each do |d|
+      # remove deleted prospects from index list
+      # b = @prospects.delete(d)
+    # end
   end
 
   # GET /prospects/new
@@ -141,6 +181,14 @@ class ProspectsController < ApplicationController
     redirect_to action: "index"
   end
 
+  def chosen
+    prospect = Prospect.find_by name: params[:prospect_name]
+    redirect_to prospect
+  end
+
+  def summary
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_prospect
@@ -149,6 +197,8 @@ class ProspectsController < ApplicationController
     end
 
     def set_user_and_manager
+      @method = ['CALL', 'VOICEMAIL', 'EMAIL', 'TEXT', 'IN PERSON', 'SOCIAL MEDIA']
+      @outcome = ['ORDER', 'INFORMATION REQUESTED', 'CALL BACK', 'NO INTEREST']
       @user = current_user.email.upcase
       @manager = false
       if @user == 'ADMIN' || current_user.manager_id.upcase == @user
@@ -186,61 +236,40 @@ class ProspectsController < ApplicationController
       end
       if @user == 'ADMIN'
         # see all the prospects
-        @prospects = Prospect.all
-      elsif @user == @mngr
+        @prospects = Prospect.where(status: false).to_a
+      else
         # a manager should see all the prospects of their reps
         reps = User.where(manager_id: @mngr)
         @prospects = []
         reps.each do |r|
           rep = r.email.upcase
           prospects = Prospect.where(rep: rep).where(status: false).to_a
-          prospects.each do |p|
-            @prospects.push(p)
-          end
+          @prospects = @prospects + prospects
         end
+      end
+    end
+
+    def build_inactive_rep_list
+    # Set up the prospect list for the signed in rep or all prospects for an admin
+      @user = current_user.email.upcase
+      user = User.find_by(email: current_user.email)
+      if user.manager_id
+        @mngr = user.manager_id.upcase
       else
-        # just show prospects for this rep
-        @prospects = Prospect.where(rep: @user).where(status: false).to_a
+        @mngr = ' '
       end
-      # need to read last 4 orders for the customer
-      deleted_prospects = []
-      j = 0
-      @orders = []
-      @prospects.each do |prospect|
-        if prospect.customer_id && prospect.customer_id != ''
-          # there is something in the customer field so see if there are any E21 records
-          sales = DartSalesPricingCurrent.where(cust_code: prospect.customer_id).take(4)
-          if sales && sales.length == 4
-            # this customer is no longer a prospect so delete it
-            deleted_prospects.push(prospect)
-            prospect.destroy
-          else
-            len = sales.length
-            i = 0
-            while i < len do
-              @orders[j] = sales[i].order_date
-              i += 1
-              j += 1
-            end
-            while i < 3 do
-              @orders[j] = ''
-              i += 1
-              j += 1
-            end
-            # check the billto table to get the payment terms
-          end
-        else
-          i = 0
-          while i < 3 do
-            @orders[j] = ''
-            i += 1
-            j += 1
-          end
+      if @user == 'ADMIN'
+        # see all the prospects
+        @prospects = Prospect.where(status: true).to_a
+      else
+        # a manager should see all the prospects of their reps
+        reps = User.where(manager_id: @mngr)
+        @prospects = []
+        reps.each do |r|
+          rep = r.email.upcase
+          prospects = Prospect.where(rep: rep).where(status: true).to_a
+          @prospects = @prospects + prospects
         end
-      end
-      deleted_prospects.each do |d|
-        # remove deleted prospects from index list
-        b = @prospects.delete(d)
       end
     end
 
@@ -252,7 +281,9 @@ class ProspectsController < ApplicationController
           :id,
           :who,
           :outcome,
-          :call_date
+          :call_date,
+          :method,
+          :subject
         ]
       )
     end
