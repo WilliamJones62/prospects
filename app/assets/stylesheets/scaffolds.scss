@@ -71,8 +71,8 @@ div {
 
 .primary-logo {
   margin: 0;
-  width: 8.12em;
-  height: 4.7em;
+  width: 12.12em;
+  height: 6.7em;
   float: left;
   position: relative;
   background: image-url("/assets/DArtagnan_Logo_2015_CMYK_mini.jpg");
@@ -176,4 +176,105 @@ label {
 
 .dropdown:hover .dropdown-content {
     display: block;
+}
+
+@media screen and (max-width: 700px) {
+  body {
+  background-color: #fff;
+  color: #333;
+  margin: 3px;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 2vw;
+  line-height: 3vw;
+  }
+
+  p, ol, ul, td, input, select, textarea {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 2vw;
+    line-height:3vw;
+  }
+
+  pre {
+    background-color: #eee;
+    padding: 10px;
+    font-size: 2vw;
+  }
+
+  a:link, a:visited {
+      background-color: white;
+      color: black;
+      border: 0.5vw solid black;
+      border-radius: 0.5vw;
+      padding: 0.5vw 0.5vw;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+  }
+
+  a:hover, a:active {
+      background-color: black;
+      color: white;
+      box-shadow: 0.5vw 1vw 1vw #888888;
+  }
+
+  th, td {
+    padding: 0.5vw;
+    text-align: left;
+  }
+
+  div {
+    &.field, &.actions {
+      margin-bottom: 1vw;
+    }
+  }
+
+  .title {
+    text-align: center;
+    font-size:5vw;
+    float: left;
+    margin-left: 5vw;
+    margin-right: 5vw;
+  }
+
+  .primary-logo {
+    margin: 0;
+    width: 10vw;
+    height: 5vw;
+    float: left;
+    position: relative;
+    background: image-url("/assets/DArtagnan_Logo_2015_CMYK_mini.jpg");
+    background-size: 100% 100%;
+  }
+
+  #error_explanation {
+    width: 450px;
+    border: 2px solid red;
+    padding: 7px 7px 0;
+    margin-bottom: 20px;
+    background-color: #f0f0f0;
+
+    h2 {
+      text-align: left;
+      font-weight: bold;
+      padding: 0.5vw 0.5vw 0.5vw 1vw;
+      font-size: 3vw;
+      margin: -0.5vw -0.5 0;
+      background-color: #c00;
+      color: #fff;
+    }
+
+    ul li {
+      font-size: 3vw;
+      list-style: square;
+    }
+  }
+
+  #navbar span {
+    float: left;
+    margin-right: 0.5vw;
+  }
+}
+
+.global {
+  margin-left: 1em;
 }

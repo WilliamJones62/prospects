@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<% if !@name %>
+  <h3>No prospects</h3>
+<% else %>
+  <%= form_with url: prospects_chosen_path, local: true, method: 'get' do |f| %>
+    <%= f.label(:rep, 'Rep:') %>
+    <%= f.select :rep, @rep, {include_blank: true, selected: $rep}, {:value => params[:rep], :id => "rep", :onChange=> ('set_name()')} %>
+    <%= f.label:prospect_name, 'Name:' %>
+    <%= f.select :prospect_name, @name, {selected: $name}, {:value => params[:name], :id => "name"} %>
+    <%= f.submit "Select" %>
+  <% end %>
+  <p id= "reps" hidden> <%= $reps %> </p>
+  <p id= "names" hidden> <%= $names %> </p>
+<% end %>

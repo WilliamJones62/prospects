@@ -1,56 +1,17 @@
 class ProspectsController < ApplicationController
   before_action :set_prospect, only: [:show, :edit, :update, :destroy]
   before_action :set_first_and_last, only: [:show, :edit]
-  before_action :set_user_and_manager, only: [:new, :edit]
-  before_action :build_rep_list, only: [:summary]
+  before_action :set_user_and_manager
+  before_action :build_rep_list, only: [:index]
   before_action :build_inactive_rep_list, only: [:inactive]
+  before_action :build_customer_list, only: [:customer]
 
   # GET /prospects
   def index
-    @user = current_user.email.upcase
-    if @user == 'ADMIN'
-      prospects = Prospect.where(status: false).to_a
-    else
-      prospects = Prospect.where(rep: @user).where(status: false).to_a
-    end
-    @name = []
-    tempname = []
-    prospects.each do |p|
-      if !p.name.blank?
-        tempname.push(p.name)
-      end
-    end
-    @name = tempname.sort
   end
 
   # GET /prospects/1
   def show
-    # need to read last 4 orders for the customer
-    deleted_prospects = []
-    @orders = []
-    if @prospect.customer_id && @prospect.customer_id != ''
-      # there is something in the customer field so see if there are any E21 records
-      sales = DartSalesPricingCurrent.where(cust_code: @prospect.customer_id).take(4)
-      # if sales && sales.length == 4
-        # this customer is no longer a prospect so set it to inactive
-        # inactive_prospects.push(prospect)
-        # prospect.inactive = true
-        # prospect.save
-      # else
-      if sales
-        len = sales.length
-        i = 0
-        while i < len do
-          @orders[i] = sales[i].order_date
-          i += 1
-        end
-        # check the billto table to get the payment terms
-      end
-    end
-    # inactive_prospects.each do |d|
-      # remove deleted prospects from index list
-      # b = @prospects.delete(d)
-    # end
   end
 
   # GET /prospects/new
@@ -58,20 +19,37 @@ class ProspectsController < ApplicationController
     @new = true
     @first = ' '
     @last = ' '
+    @required_date = Time.current.strftime('%Y-%m-%d')
     @prospect = Prospect.new
-    @prospect.prospect_calls.build
+    @prospect.prospect_calls.build call_date: @required_date
   end
 
   # GET /prospects/1/edit
   def edit
     @new = false
     $rep = @prospect.rep
-    @prospect.prospect_calls.build
+    $name = @prospect.name
+    @required_date = Time.current.strftime('%Y-%m-%d')
+    @prospect.prospect_calls.build call_date: @required_date
   end
 
   # POST /prospects
   def create
-    @prospect = Prospect.new(prospect_params)
+    pp = prospect_params
+    if !pp[:customer_id].blank? && pp[:ship_to].blank?
+      pp[:ship_to] = pp[:customer_id]
+    end
+    @prospect = Prospect.new(pp)
+    @prospect.active_date = Date.today
+    @prospect.name.upcase!
+    if !@prospect.zip.blank?
+      a = Geocode.where(["zip = ?", @prospect.zip])
+      if a.length > 0
+        z = a[a.length-1]
+        @prospect.city = z.city_name
+        @prospect.state = z.state_name
+      end
+    end
     respond_to do |format|
       if @prospect.save
         format.html { redirect_to @prospect, notice: 'Prospect was successfully created.' }
@@ -84,10 +62,26 @@ class ProspectsController < ApplicationController
   # PATCH/PUT /prospects/1
   def update
     pp = prospect_params
+    pp[:name].upcase!
     if pp[:rep] != $rep
       # rep has changed so store the previous rep
       pp[:prev_rep] = $rep
       pp[:rep_date] = Date.today
+    end
+    if !pp[:status] && @prospect.status
+      # prospect has changed from inactive to active so store todays date
+      pp[:active_date] = Date.today
+    end
+    if !pp[:zip].blank?
+      a = Geocode.where(["zip = ?", pp[:zip]])
+      if a.length > 0
+        z = a[a.length-1]
+        pp[:city] = z.city_name
+        pp[:state] = z.state_name
+      end
+    end
+    if !pp[:customer_id].blank? && pp[:ship_to].blank?
+      pp[:ship_to] = pp[:customer_id]
     end
     respond_to do |format|
       if @prospect.update(pp)
@@ -98,13 +92,23 @@ class ProspectsController < ApplicationController
     end
   end
 
+  def destroy
+    @prospect.destroy
+    respond_to do |format|
+      format.html { redirect_to prospects_inactive_path, notice: 'Prospect was successfully deleted.' }
+    end
+  end
+
+  def inactive
+  end
+
   def list
     if !$prospect_reps
       # first time in
       @rep = []
       rep = []
       temprep = []
-      reps = User.all
+      reps = User2.all
       reps.each do |r|
         if r.manager_id != 'MAINT' && r.email != 'admin'
           temprep.push(r.email.upcase)
@@ -182,11 +186,46 @@ class ProspectsController < ApplicationController
   end
 
   def chosen
-    prospect = Prospect.find_by name: params[:prospect_name]
-    redirect_to prospect
+    $name = params[:prospect_name]
+    $rep = params[:rep]
+    prospect = Prospect.find_by name: params[:prospect_name].upcase
+    if prospect
+      redirect_to prospect
+    else
+      redirect_to action: "index", notice: 'Prospect was not found.'
+    end
   end
 
-  def summary
+  def find
+    prospect = Prospect.find_by name: params[:name].upcase
+    if prospect
+      if prospect.status
+        redirect_to prospects_search_path, notice: 'Prospect inactive, contact manager.'
+      else
+        redirect_to prospects_search_path, notice: 'Prospect already allocated.'
+      end
+    else
+      o = Orderfrom.where(bus_name: params[:name].upcase)
+      if o && o.length > 0
+        orderfrom = o.first
+        if !orderfrom.acct_manager.blank?
+          if orderfrom.acct_manager[0,2] == 'HO' || orderfrom.acct_manager[0,2] == 'DA'
+            if @manager
+              redirect_to new_prospect_path, notice: 'Prospect is a House Account.'
+            else
+              redirect_to prospects_search_path, notice: 'Prospect is a House Account, contact manager.'
+            end
+          else
+            redirect_to prospects_search_path, notice: 'Prospect is already an account.'
+          end
+        else
+          redirect_to prospects_search_path, notice: 'Prospect is already an account.'
+        end
+      else
+        $name = params[:name].upcase
+        redirect_to action: "new"
+      end
+    end
   end
 
   private
@@ -197,11 +236,17 @@ class ProspectsController < ApplicationController
     end
 
     def set_user_and_manager
-      @method = ['CALL', 'VOICEMAIL', 'EMAIL', 'TEXT', 'IN PERSON', 'SOCIAL MEDIA']
-      @outcome = ['ORDER', 'INFORMATION REQUESTED', 'CALL BACK', 'NO INTEREST']
-      @user = current_user.email.upcase
+      @method = ['CALL', 'EMAIL', 'IN PERSON', 'SOCIAL MEDIA', 'TEXT']
+      @outcome = ['CONTACT NOT AVAILABLE', 'CALL BACK REQUESTED', 'CREDIT APP SENT', 'INFORMATION REQUESTED', 'LEFT MESSAGE', 'MEETING SCHEDULED', 'NO INTEREST', 'ORDER']
+      @source = ['CHEF REFERRAL', 'COLD CALL', 'EVENT', 'HOUSE ACCOUNT', 'NEW OPENING', 'PHONE CALL', 'SOCIAL MEDIA', 'WEBSITE LEADS', 'LOADED']
+      @user = current_user2.email.upcase
+      @mngr = current_user2.manager_id.upcase
+      if current_user2.manager_id.upcase == 'ISR'
+        @user_isr = @user
+        @user = 'ADMIN'
+      end
       @manager = false
-      if @user == 'ADMIN' || current_user.manager_id.upcase == @user
+      if @user == 'ADMIN' || @mngr == @user
         @manager = true
       end
     end
@@ -227,47 +272,89 @@ class ProspectsController < ApplicationController
 
     def build_rep_list
     # Set up the prospect list for the signed in rep or all prospects for an admin
-      @user = current_user.email.upcase
-      user = User.find_by(email: current_user.email)
-      if user.manager_id
-        @mngr = user.manager_id.upcase
-      else
-        @mngr = ' '
-      end
       if @user == 'ADMIN'
+        @reps = User2.all
         # see all the prospects
         @prospects = Prospect.where(status: false).to_a
-      else
+      elsif @mngr == @user
         # a manager should see all the prospects of their reps
-        reps = User.where(manager_id: @mngr)
+        @reps = User2.where(manager_id: @mngr)
         @prospects = []
-        reps.each do |r|
+        @reps.each do |r|
           rep = r.email.upcase
           prospects = Prospect.where(rep: rep).where(status: false).to_a
           @prospects = @prospects + prospects
+        end
+      else
+        # a rep should only see there own prospects
+        @prospects = Prospect.where(rep: @user).where(status: false).to_a
+      end
+      @first_call = []
+      @first_unformatted = []
+      @last_call = []
+      @prospects.each do |p|
+        # need to find the first, second, third and last call date, if they exist, for each prospect by looking at the calls
+        # collect all the call_date fields, then sort them
+        if p.prospect_calls.length == 0
+          # no call data so set everything to spaces
+          @first_call.push(' ')
+          @first_unformatted.push(' ')
+          @last_call.push(' ')
+        else
+          tempcalls = []
+          if p.prospect_calls.length == 1
+            # only one call
+            @first_call.push(p.prospect_calls.first.call_date.strftime("%Y %m %d"))
+            @first_unformatted.push(p.prospect_calls.first.call_date)
+            @last_call.push(p.prospect_calls.first.call_date.strftime("%Y %m %d"))
+          else
+            p.prospect_calls.each do |c|
+              tempcalls.push(c.call_date)
+            end
+            tempcalls.sort!
+            if p.prospect_calls.length == 2
+              @first_call.push(tempcalls[0].strftime("%Y %m %d"))
+              @first_unformatted.push(tempcalls[0])
+              @last_call.push(tempcalls[1].strftime("%Y %m %d"))
+            else
+              @first_call.push(tempcalls[0].strftime("%Y %m %d"))
+              @first_unformatted.push(tempcalls[0])
+              @last_call.push(tempcalls.last.strftime("%Y %m %d"))
+            end
+          end
         end
       end
     end
 
     def build_inactive_rep_list
     # Set up the prospect list for the signed in rep or all prospects for an admin
-      @user = current_user.email.upcase
-      user = User.find_by(email: current_user.email)
-      if user.manager_id
-        @mngr = user.manager_id.upcase
-      else
-        @mngr = ' '
-      end
       if @user == 'ADMIN'
         # see all the prospects
-        @prospects = Prospect.where(status: true).to_a
+        @prospects = Prospect.where(status: true).where(customer: nil).to_a
       else
         # a manager should see all the prospects of their reps
-        reps = User.where(manager_id: @mngr)
+        reps = User2.where(manager_id: @mngr)
         @prospects = []
         reps.each do |r|
           rep = r.email.upcase
-          prospects = Prospect.where(rep: rep).where(status: true).to_a
+          prospects = Prospect.where(rep: rep).where(status: true).where.not(customer: true).to_a
+          @prospects = @prospects + prospects
+        end
+      end
+    end
+
+    def build_customer_list
+    # Set up the prospect list for the signed in rep or all prospects for an admin
+      if @user == 'ADMIN'
+        # see all the prospects
+        @prospects = Prospect.where(customer: true).to_a
+      else
+        # a manager should see all the prospects of their reps
+        reps = User2.where(manager_id: @mngr)
+        @prospects = []
+        reps.each do |r|
+          rep = r.email.upcase
+          prospects = Prospect.where(rep: rep).where(customer: true).to_a
           @prospects = @prospects + prospects
         end
       end
@@ -276,7 +363,7 @@ class ProspectsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def prospect_params
       params.require(:prospect).permit(
-        :customer_id, :name, :calls, :first_call, :last_call, :credit_terms, :rep, :status,
+        :customer_id, :name, :credit_terms, :rep, :status, :source, :zip, :active_date, :city, :state, :ship_to,
         prospect_calls_attributes: [
           :id,
           :who,

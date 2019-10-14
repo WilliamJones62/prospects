@@ -1,21 +1,19 @@
-<h2 class="primary-logo">
-</h2>
-<h1 class="title">Prospects
-</h1>
-
-<% if current_user %>
+<span class="primary-logo">
+</span>
+<% if current_user2 %>
   <div id="navbar">
-    <span><%= link_to 'Home', prospects_path %></span>
-    <span><%= link_to 'New', new_prospect_path %></span>
-    <span><%= link_to 'Customer', '/prospects/list' %></span>
-    <span><%= link_to 'Password', edit_user_registration_path %></span>
-    <% if current_user.email == "admin" || current_user.email.upcase == current_user.manager_id %>
-      <span><%= link_to 'Summary', '/prospects/summary' %></span>
+    <span><%= link_to 'Summary', prospects_path  %></span>
+    <span><%= link_to 'New', '/prospects/search' %></span>
+    <span><%= link_to 'Password', edit_user2_registration_path %></span>
+    <span><%= link_to 'Sign out', destroy_user2_session_path, method: :delete %></span>
+    <% if @manager %>
       <span><%= link_to 'Inactive', '/prospects/inactive' %></span>
+      <span><%= link_to 'Customer', '/prospects/customer' %></span>
     <% end %>
-    <% if current_user.email == "admin" %>
-      <span><%= link_to 'Sign up', new_user_registration_path %></span>
+    <% if current_user2.email == "admin" %>
+      <span><%= link_to 'Sign up', new_user2_registration_path %></span>
     <% end %>
   </div>
 <% end %>
+
 <br>

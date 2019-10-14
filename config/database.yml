@@ -7,7 +7,7 @@
 default: &default
   adapter: sqlite3
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  timeout: 10000
+  timeout: 30000
 
 development:
   <<: *default
@@ -24,6 +24,16 @@ production:
   <<: *default
   adapter: sqlserver
   database: e21Reporting
-  dataserver: sqlserver01\reporting
+  # dataserver: sqlserver01\reporting
+  dataserver: 10.0.0.215\reporting
+  username: intranet
+  password: Duck600it
+
+e21prod:
+  <<: *default
+  adapter: sqlserver
+  database: e21prod
+  # dataserver: sqlserver01\reporting
+  dataserver: 10.0.0.215\reporting
   username: intranet
   password: Duck600it

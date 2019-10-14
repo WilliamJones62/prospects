@@ -1,6 +1,5 @@
 <p id="notice"><%= notice %></p>
-
-<h3>Inactive Prospects</h3>
+<h3>Prospects To Customers</h3>
 
 <table id="normal_dt"  class="stripe" class="mytable" class="display" cellspacing="0" >
   <thead>
@@ -8,12 +7,10 @@
       <% if @user == "admin" || @user == @mngr %>
         <th>Rep</th>
       <% end %>
-      <th>Customer</th>
-      <th>Ship to</th>
+      <th>Custcode</th>
       <th>Name</th>
       <th>Activities</th>
       <th>Last activity</th>
-      <th>Inactive</th>
       <th>Show</th>
       <th>Edit</th>
       <th>Delete</th>
@@ -27,11 +24,9 @@
           <td><%= prospect.rep %></td>
         <% end %>
         <td><%= prospect.customer_id %></td>
-        <td><%= prospect.ship_to %></td>
         <td><%= prospect.name %></td>
         <td><%= prospect.prospect_calls.count %></td>
         <td><%= last_call(prospect.id) %></td>
-        <td> <%= human_boolean(prospect.status) %> </td>
         <td><%= link_to 'Show', prospect %></td>
         <td><%= link_to 'Edit', edit_prospect_path(prospect) %></td>
         <td><%= link_to 'Delete', prospect, method: :delete, data: { confirm: 'Are you sure?' } %></td>

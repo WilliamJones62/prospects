@@ -7,7 +7,15 @@
       autoWidth: true,
       responsive: true,
       retrieve: true,
+      stateSave: true,
       dom: 'Bfrtip',
+      columnDefs: [ {
+          targets: [ 0 ],
+          orderData: [ 0, 1 ]
+      }, {
+          targets: [ 1 ],
+          orderData: [ 1, 0 ]
+      } ],
       buttons: [
         {
         extend: 'print',

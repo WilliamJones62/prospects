@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190218185531) do
+ActiveRecord::Schema.define(version: 20190711133254) do
 
   create_table "billtos", force: :cascade do |t|
     t.string "billto_code"
@@ -112,6 +112,21 @@ ActiveRecord::Schema.define(version: 20190218185531) do
     t.string "Fiscal_Month"
   end
 
+  create_table "geocodes", force: :cascade do |t|
+    t.string "state_name"
+    t.string "city_name"
+    t.string "zip"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "orderfroms", force: :cascade do |t|
+    t.string "bus_name"
+    t.string "acct_manager"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "prospect_calls", force: :cascade do |t|
     t.integer "prospect_id"
     t.string "who"
@@ -126,9 +141,6 @@ ActiveRecord::Schema.define(version: 20190218185531) do
   create_table "prospects", force: :cascade do |t|
     t.string "customer_id"
     t.string "name"
-    t.integer "calls"
-    t.date "first_call"
-    t.date "last_call"
     t.string "credit_terms"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -136,6 +148,13 @@ ActiveRecord::Schema.define(version: 20190218185531) do
     t.string "prev_rep"
     t.date "rep_date"
     t.boolean "status"
+    t.string "source"
+    t.string "zip"
+    t.date "active_date"
+    t.boolean "customer"
+    t.string "city"
+    t.string "state"
+    t.string "ship_to"
   end
 
   create_table "users", force: :cascade do |t|
@@ -146,6 +165,7 @@ ActiveRecord::Schema.define(version: 20190218185531) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "manager"
     t.string "manager_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

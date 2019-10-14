@@ -7,14 +7,12 @@
     <tr>
       <th> Rep </th>
       <th> Business name </th>
-      <th> Calls </th>
-      <th> First call </th>
-      <th> Last call </th>
+      <th> Activities </th>
+      <th> First activity </th>
+      <th> Last activity </th>
       <th> Customer </th>
-      <th> Inactive </th>
-      <th> Orders </th>
-      <th> First order </th>
-      <th> Last order </th>
+      <th> Ship to </th>
+      <th> Inactive? </th>
     </tr>
   </thead>
   <tbody>
@@ -34,18 +32,8 @@
         <% end %>
       <% end %>
       <td> <%= @prospect.customer_id %> </td>
+      <td> <%= @prospect.ship_to %> </td>
       <td> <%= human_boolean(@prospect.status) %> </td>
-      <td><%= @orders.count %></td>
-      <% if @orders.first && @orders.first != '' %>
-        <td><%= display_date(@orders.first) %></td>
-      <% else %>
-        <td></td>
-      <% end %>
-      <% if @orders.last && @orders.last != '' %>
-        <td><%= display_date(@orders.last) %></td>
-      <% else %>
-        <td></td>
-      <% end %>
     </tr>
   </tbody>
 </table>
@@ -53,23 +41,37 @@
 <table id="normal_dt"  class="stripe" class="mytable" class="display" cellspacing="0" >
   <thead>
     <tr>
+      <th hidden> ID </th>
       <th> Contact </th>
-      <th> Outcome </th>
       <th> Call date </th>
-      <th> Delete </th>
+      <th> Method </th>
+      <th> Notes </th>
+      <th> Outcome </th>
+      <% if @manager %>
+      <th> Created at </th>
+      <% end %>
     </tr>
   </thead>
   <tbody>
     <% @prospect.prospect_calls.each do |c| %>
     <tr>
+      <td hidden> <%= c.id %> </td>
       <td> <%= c.who %> </td>
-      <td> <%= c.outcome %> </td>
       <td> <%= display_date(c.call_date) %> </td>
-      <td><%= link_to 'Delete', prospect_prospect_call_path(@prospect.id, c.id), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <td> <%= c.method %> </td>
+      <% if c.subject %>
+        <td> <%= c.subject[0,20] %> </td>
+      <% end %>
+      <td> <%= c.outcome %> </td>
+      <% if @manager %>
+      <td> <%= c.created_at %> </td>
+      <% end %>
     </tr>
     <% end %>
   </tbody>
 </table>
 
-<%= link_to 'Edit', edit_prospect_path(@prospect) %>
+<% if @manager || @user == @prospect.rep %>
+  <%= link_to 'Edit', edit_prospect_path(@prospect) %>
+<% end %>
 <%= link_to 'List', prospects_path %>

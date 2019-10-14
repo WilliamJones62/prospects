@@ -1,11 +1,54 @@
 <p id="notice"><%= notice %></p>
+<h3>Prospects Summary</h3>
 
-<% if !@name %>
-  <h3>No prospects</h3>
-<% else %>
-  <%= form_with url: prospects_chosen_path, local: true, method: 'get' do |f| %>
-    <%= f.label:prospect_name, 'Name:' %>
-    <%= f.select(:prospect_name, options_for_select(@name)) %>
-    <%= f.submit "Select" %>
-  <% end %>
-<% end %>
+<table id="normal_dt"  class="stripe" class="mytable" class="display" cellspacing="0" >
+  <thead>
+    <tr>
+      <th>Customer</th>
+      <th>Name</th>
+      <th>City/State</th>
+      <% if @user == "admin" || @user == @mngr %>
+        <th>Rep</th>
+      <% end %>
+      <th>Activities</th>
+      <th>1st activity</th>
+      <th>Last activity</th>
+      <th>Days active</th>
+      <th>Show</th>
+      <th>Edit</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% i = 0 %>
+    <% @prospects.each do |prospect| %>
+      <tr>
+        <td><%= prospect.customer_id %></td>
+        <td><%= prospect.name %></td>
+        <td><%= city_state(prospect) %></td>
+        <% if @user == "admin" || @user == @mngr %>
+          <td><%= prospect.rep %></td>
+        <% end %>
+        <td><%= prospect.prospect_calls.count %></td>
+        <td><%= @first_call[i] %></td>
+        <td><%= @last_call[i] %></td>
+        <% if prospect.active_date.blank? %>
+          <% if @first_call[i].blank? %>
+            <td> UNKNOWN </td>
+          <% else %>
+            <td><%= days_active(@first_unformatted[i]) %></td>
+          <% end %>
+        <% else  %>
+          <td><%= days_active(prospect.active_date) %></td>
+        <% end %>
+        <td><%= link_to 'Show', prospect %></td>
+        <td><%= link_to 'Edit', edit_prospect_path(prospect) %></td>
+      </tr>
+      <% i += 1 %>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Prospect', prospects_search_path %>

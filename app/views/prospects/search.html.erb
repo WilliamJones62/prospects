@@ -1,0 +1,9 @@
+<p id="notice"><%= notice %></p>
+
+<h3>Prospect Search</h3>
+
+<%= form_with url: prospects_find_path, local: true, method: 'get' do |f| %>
+  <%= f.label:prospect_name, 'Customer Name:' %>
+  <%= f.text_field :name, id: :prospect_name %>
+  <%= f.submit "Submit" %>
+<% end %>

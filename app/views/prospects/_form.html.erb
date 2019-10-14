@@ -16,18 +16,18 @@
       <tr>
         <th> <%= form.label :rep %> </th>
         <th> <%= form.label :name, "Business name" %> </th>
-        <th> <%= form.label :calls %> </th>
-        <th> <%= form.label :first_call %> </th>
-        <th> <%= form.label :last_call %> </th>
-        <th> <%= form.label :customer_id, "Customer code" %> </th>
-        <th> <%= form.label :status, "Inactive" %> </th>
-      </tr>
+        <th> <%= form.label :zip %> </th>
+        <th> <%= form.label :source %> </th>
     </thead>
     <tbody>
       <tr>
         <% if @new %>
           <% if @manager %>
-            <td> <%= form.text_field :rep, :value => @user, id: :prospect_rep %> </td>
+            <% if @user == 'ADMIN' %>
+              <td> <%= form.text_field :rep, value: @user_isr %> </td>
+            <% else %>
+              <td> <%= form.text_field :rep, :value => @user, id: :prospect_rep %> </td>
+            <% end %>
           <% else %>
             <td> <%= form.text_field :rep, :value => @user, readonly: true, id: :prospect_rep %> </td>
           <% end %>
@@ -38,7 +38,30 @@
             <td> <%= form.text_field :rep, readonly: true, id: :prospect_rep %> </td>
           <% end %>
         <% end %>
-        <td> <%= form.text_field :name, id: :prospect_name %> </td>
+        <% if @new %>
+          <td> <%= form.text_field :name, :value => $name, id: :prospect_name %> </td>
+        <% else %>
+          <td> <%= form.text_field :name, id: :prospect_name %> </td>
+        <% end %>
+        <td> <%= form.text_field :zip, size: "5", id: :prospect_zip %> </td>
+        <td> <%= form.select :source, @source, {}, {:value => params[:source], id: :prospect_source} %> </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table>
+    <thead>
+      <tr>
+        <th> <%= form.label :activities %> </th>
+        <th> <%= form.label :first_activity %> </th>
+        <th> <%= form.label :last_activity %> </th>
+        <th> <%= form.label :customer_id, "Customer code" %> </th>
+        <th> <%= form.label :ship_to %> </th>
+        <th> <%= form.label :status, "Inactive?" %> </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
         <td> <%= @prospect.prospect_calls.count %> </td>
         <% if @first == ' ' %>
           <td></td>
@@ -52,29 +75,38 @@
           <% end %>
         <% end %>
         <td> <%= form.text_field :customer_id, id: :prospect_customer_id %> </td>
-        <td> <%= form.check_box :status, id: :prospect_status %> </td>
+        <td> <%= form.text_field :ship_to, id: :prospect_ship_to %> </td>
+        <% if @manager %>
+          <td> <%= form.check_box :status, id: :prospect_status %> </td>
+        <% else %>
+          <td> <%= form.check_box :status, readonly: true, id: :prospect_status %> </td>
+        <% end %>
       </tr>
     </tbody>
   </table>
 
-  <h3>Calls</h3>
+  <h3>Activities</h3>
+  <% i = 1 %>
   <%= form.fields_for :prospect_calls do |p| %>
   <table>
-    <thead>
-      <tr>
-        <td> <%= p.label :who, 'Contact' %> </td>
-        <td> <%= p.label :call_date %> </td>
-        <td> <%= p.label :method %> </td>
-        <td> <%= p.label :subject %> </td>
-        <td> <%= p.label :outcome %> </td>
-      </tr>
-    </thead>
+    <% if i == 1 %>
+      <thead>
+        <tr>
+          <th> <%= p.label :who, 'Contact' %> </th>
+          <th> <%= p.label :call_date, 'Activity date' %> </th>
+          <th> <%= p.label :method %> </th>
+          <th> <%= p.label :subject, 'Notes' %> </th>
+          <th> <%= p.label :outcome %> </th>
+        </tr>
+      </thead>
+      <% i = 2 %>
+    <% end %>
     <tbody>
         <tr>
-          <td> <%= p.text_field :who %> </td>
-          <td> <%= p.date_field :call_date %> </td>
+          <td> <%= p.text_field :who, size: "15" %> </td>
+          <td> <%= p.date_field :call_date, size: "10" %> </td>
           <td> <%= p.select :method, @method %> </td>
-          <td> <%= p.text_field :subject %> </td>
+          <td> <%= p.text_area :subject, size: "20x4" %> </td>
           <td> <%= p.select :outcome, @outcome %> </td>
         </tr>
     </tbody>
