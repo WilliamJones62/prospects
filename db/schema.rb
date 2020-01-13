@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190711133254) do
+ActiveRecord::Schema.define(version: 20191119151206) do
 
   create_table "billtos", force: :cascade do |t|
     t.string "billto_code"
@@ -155,6 +155,8 @@ ActiveRecord::Schema.define(version: 20190711133254) do
     t.string "city"
     t.string "state"
     t.string "ship_to"
+    t.boolean "compass"
+    t.boolean "new_opening"
   end
 
   create_table "users", force: :cascade do |t|

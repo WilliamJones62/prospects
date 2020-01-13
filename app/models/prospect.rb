@@ -7,7 +7,7 @@ class Prospect < ApplicationRecord
 
   def self.get_orders
     all.each do |p|
-      if !p.status && !p.customer_id.blank?
+      if !p.customer_id.blank?
         # active prospect with a customer code
         if p.ship_to.blank? || p.ship_to == p.customer_id
           sales = DartSalesPricingCurrent.where(cust_code: p.customer_id).where("sale_date >= ?", 8.weeks.ago).where("sales_dol > ?", 0).uniq{|s| s.order_numb}.take(3)

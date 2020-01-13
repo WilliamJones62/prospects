@@ -13,6 +13,8 @@
       <th> Customer </th>
       <th> Ship to </th>
       <th> Inactive? </th>
+      <th> New opening? </th>
+      <th> Compass? </th>
     </tr>
   </thead>
   <tbody>
@@ -34,6 +36,8 @@
       <td> <%= @prospect.customer_id %> </td>
       <td> <%= @prospect.ship_to %> </td>
       <td> <%= human_boolean(@prospect.status) %> </td>
+      <td> <%= human_boolean(@prospect.new_opening) %> </td>
+      <td> <%= human_boolean(@prospect.compass) %> </td>
     </tr>
   </tbody>
 </table>

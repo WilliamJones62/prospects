@@ -18,6 +18,8 @@
         <th> <%= form.label :name, "Business name" %> </th>
         <th> <%= form.label :zip %> </th>
         <th> <%= form.label :source %> </th>
+        <th> <%= form.label :new_opening, "New opening?" %> </th>
+        <th> <%= form.label :compass, "Compass?" %> </th>
     </thead>
     <tbody>
       <tr>
@@ -45,6 +47,8 @@
         <% end %>
         <td> <%= form.text_field :zip, size: "5", id: :prospect_zip %> </td>
         <td> <%= form.select :source, @source, {}, {:value => params[:source], id: :prospect_source} %> </td>
+        <td> <%= form.check_box :new_opening, id: :prospect_new_opening %> </td>
+        <td> <%= form.check_box :compass, id: :prospect_compass %> </td>
       </tr>
     </tbody>
   </table>
