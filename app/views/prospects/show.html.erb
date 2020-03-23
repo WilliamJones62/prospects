@@ -64,7 +64,7 @@
       <td> <%= display_date(c.call_date) %> </td>
       <td> <%= c.method %> </td>
       <% if c.subject %>
-        <td> <%= c.subject[0,20] %> </td>
+        <td> <%= word_wrap(c.subject, line_width: 20) %> </td>
       <% end %>
       <td> <%= c.outcome %> </td>
       <% if @manager %>

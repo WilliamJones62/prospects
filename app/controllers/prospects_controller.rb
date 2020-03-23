@@ -31,6 +31,8 @@ class ProspectsController < ApplicationController
     $name = @prospect.name
     @required_date = Time.current.strftime('%Y-%m-%d')
     @prospect.prospect_calls.build call_date: @required_date
+    # calls = @prospect.prospect_calls.all
+    # @prospect_calls = calls.sort_by { |call| [call.call_date] }
   end
 
   # POST /prospects
@@ -39,9 +41,11 @@ class ProspectsController < ApplicationController
     if !pp[:customer_id].blank? && pp[:ship_to].blank?
       pp[:ship_to] = pp[:customer_id]
     end
+    pp[:customer] = false
     @prospect = Prospect.new(pp)
     @prospect.active_date = Date.today
     @prospect.name.upcase!
+    @prospect.customer = false
     if !@prospect.zip.blank?
       a = Geocode.where(["zip = ?", @prospect.zip])
       if a.length > 0
@@ -85,6 +89,7 @@ class ProspectsController < ApplicationController
     end
     respond_to do |format|
       if @prospect.update(pp)
+
         format.html { redirect_to @prospect, notice: 'Prospect was successfully updated.' }
       else
         format.html { render :edit }
@@ -211,6 +216,7 @@ class ProspectsController < ApplicationController
         if !orderfrom.acct_manager.blank?
           if orderfrom.acct_manager[0,2] == 'HO' || orderfrom.acct_manager[0,2] == 'DA'
             if @manager
+              $name = orderfrom.bus_name
               redirect_to new_prospect_path, notice: 'Prospect is a House Account.'
             else
               redirect_to prospects_search_path, notice: 'Prospect is a House Account, contact manager.'
@@ -330,14 +336,14 @@ class ProspectsController < ApplicationController
     # Set up the prospect list for the signed in rep or all prospects for an admin
       if @user == 'ADMIN'
         # see all the prospects
-        @prospects = Prospect.where(status: true).where(customer: nil).to_a
+        @prospects = Prospect.where(status: true).where(customer: false).to_a
       else
         # a manager should see all the prospects of their reps
         reps = User2.where(manager_id: @mngr)
         @prospects = []
         reps.each do |r|
           rep = r.email.upcase
-          prospects = Prospect.where(rep: rep).where(status: true).where.not(customer: true).to_a
+          prospects = Prospect.where(rep: rep).where(status: true).where(customer: false).to_a
           @prospects = @prospects + prospects
         end
       end
@@ -363,7 +369,7 @@ class ProspectsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def prospect_params
       params.require(:prospect).permit(
-        :customer_id, :name, :credit_terms, :rep, :status, :source, :zip, :active_date, :city, :state, :ship_to, :new_opening, :compass,
+        :customer_id, :name, :credit_terms, :rep, :status, :source, :zip, :active_date, :city, :state, :ship_to, :new_opening, :compass, :customer,
         prospect_calls_attributes: [
           :id,
           :who,
