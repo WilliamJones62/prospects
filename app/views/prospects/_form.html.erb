@@ -109,7 +109,12 @@
     <tbody>
         <tr>
           <td> <%= p.text_field :who, size: "15" %> </td>
-          <td> <%= p.date_field :call_date, max: Date.today, min: @prospect.created_at - 10 %> </td>
+          <% if @new %>
+            <td> <%= p.date_field :call_date, max: Date.today, min: Date.today - 10 %> </td>
+          <% else %>
+            <!-- Pierre needed to update prospects that contained activities with invalid dates -->
+            <td> <%= p.date_field :call_date, max: Date.today %> </td>
+          <% end %>
           <td> <%= p.select :method, @method %> </td>
           <td> <%= p.text_area :subject, size: "20x4" %> </td>
           <td> <%= p.select :outcome, @outcome %> </td>

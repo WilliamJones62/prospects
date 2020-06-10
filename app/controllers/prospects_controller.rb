@@ -20,7 +20,13 @@ class ProspectsController < ApplicationController
     @first = ' '
     @last = ' '
     @required_date = Time.current.strftime('%Y-%m-%d')
-    @prospect = Prospect.new
+    if $house_account
+      #  fill in as much prospect information as possible for a house account
+      o = Orderfrom.find_by(bus_name: $name)
+      @prospect = Prospect.new(customer_id: o.cust_code, zip: o.zip, ship_to: o.ship_to, source: "HOUSE ACCOUNT")
+    else
+      @prospect = Prospect.new
+    end
     @prospect.prospect_calls.build call_date: @required_date
   end
 
@@ -202,6 +208,7 @@ class ProspectsController < ApplicationController
   end
 
   def find
+    $house_account = false
     prospect = Prospect.find_by name: params[:name].upcase
     if prospect
       if prospect.status
@@ -216,6 +223,7 @@ class ProspectsController < ApplicationController
         if !orderfrom.acct_manager.blank?
           if orderfrom.acct_manager[0,2] == 'HO' || orderfrom.acct_manager[0,2] == 'DA'
             if @manager
+              $house_account = true
               $name = orderfrom.bus_name
               redirect_to new_prospect_path, notice: 'Prospect is a House Account.'
             else

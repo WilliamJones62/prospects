@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20191119151206) do
+ActiveRecord::Schema.define(version: 20200601183407) do
 
   create_table "billtos", force: :cascade do |t|
     t.string "billto_code"
@@ -125,6 +125,9 @@ ActiveRecord::Schema.define(version: 20191119151206) do
     t.string "acct_manager"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "cust_code"
+    t.string "zip"
+    t.string "ship_to"
   end
 
   create_table "prospect_calls", force: :cascade do |t|
