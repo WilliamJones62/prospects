@@ -78,7 +78,7 @@ class ProspectsController < ApplicationController
       pp[:prev_rep] = $rep
       pp[:rep_date] = Date.today
     end
-    if !pp[:status] && @prospect.status
+    if pp[:status] == '0' && @prospect.status
       # prospect has changed from inactive to active so store todays date
       pp[:active_date] = Date.today
     end
