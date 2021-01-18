@@ -59,4 +59,4 @@ gem 'bcrypt', git: 'https://github.com/codahale/bcrypt-ruby.git', :require => 'b
 gem 'devise'
 gem 'dotenv'
 gem 'whenever', require: false
-gem 'rake', '12.3.2'
+gem 'rake', '12.3.3'
